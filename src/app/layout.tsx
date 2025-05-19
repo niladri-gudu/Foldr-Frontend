@@ -1,6 +1,10 @@
 import type { Metadata } from "next";
+import { ThemeProvider } from "@/components/theme-provider";
+import { ClerkLoaded, ClerkLoading, ClerkProvider } from "@clerk/nextjs";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { dark } from "@clerk/themes";
+import { Toaster } from "@/components/ui/sonner";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -23,12 +27,31 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        {children}
-      </body>
-    </html>
+    <ClerkProvider appearance={{ baseTheme: dark }}>
+      <html lang="en" suppressHydrationWarning>
+        <body
+          className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen w-full overflow-hidden`}
+        >
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <ClerkLoaded>
+              <main className="flex-1 w-full">
+                <Toaster position="top-right" />
+                {children}
+              </main>
+            </ClerkLoaded>
+            <ClerkLoading>
+              <main className="flex w-full items-center justify-center min-h-screen">
+                <span className="text-2xl">Loading...</span>
+              </main>
+            </ClerkLoading>
+          </ThemeProvider>
+        </body>
+      </html>
+    </ClerkProvider>
   );
 }
