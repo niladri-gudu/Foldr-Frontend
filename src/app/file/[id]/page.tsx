@@ -1,11 +1,7 @@
-// app/file/[id]/page.tsx (Server Component)
-
 import FilePageClient from "./client";
 
-type PageProps = {
-  params: { id: string };
-};
+export default async function FilePageWrapper(props: { params: Promise<{ id: string }> }) {
+  const { id } = await props.params;
 
-export default function FilePageWrapper({ params }: PageProps) {
-  return <FilePageClient id={params.id} />;
+  return <FilePageClient id={id} />;
 }
