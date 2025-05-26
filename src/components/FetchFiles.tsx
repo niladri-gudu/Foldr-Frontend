@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+"use client"
+
 import Link from "next/link";
 import {
   Table,
@@ -21,28 +24,11 @@ import {
   ContextMenuTrigger,
 } from "@/components/ui/context-menu";
 import FileActions from "./FileActions";
-import { auth } from "@clerk/nextjs/server";
+import { Spinner } from "./ui/spinner";
+import { useFileData } from "../hooks/useFileData";
 
-const FetchFiles = async () => {
-  const { getToken } = await auth()
-  const token = await getToken()
-
-  let files = []
-
-  try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/file/view`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-      cache: "no-store"
-    })
-
-    const data = await res.json()
-    files = data.files ?? []
-
-  } catch (error) {
-    console.error("Server component fetch failed:", error);
-  }
+const FetchFiles = () => {
+  const { files, loading } = useFileData({ endpoint: '/file/view' });
 
   const getFileIcon = (type: string) => {
     if (type.includes("folder")) return <Folder size={18} />;
@@ -90,14 +76,19 @@ const FetchFiles = async () => {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {Array.isArray(files) && files.length === 0 ? (
+          {loading ? (
+            <TableRow>
+              <TableCell colSpan={5} className="text-center py-6">
+                <Spinner />
+              </TableCell>
+            </TableRow>
+          ) : files.length === 0 ? (
             <TableRow>
               <TableCell colSpan={5} className="text-center py-6">
                 No files found.
               </TableCell>
             </TableRow>
           ) : (
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             files.map((file: any, index: number) => (
               <ContextMenu key={file._id}>
                 <ContextMenuTrigger asChild>
@@ -126,6 +117,7 @@ const FetchFiles = async () => {
         </TableBody>
       </Table>
     </div>
-  )
-}
-export default FetchFiles
+  );
+};
+
+export default FetchFiles;

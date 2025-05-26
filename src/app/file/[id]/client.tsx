@@ -3,10 +3,10 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@clerk/nextjs";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
+import { Spinner } from "@/components/ui/spinner";
 
 type FilePageClientProps = {
   id: string;
@@ -14,7 +14,6 @@ type FilePageClientProps = {
 
 export default function FilePageClient({ id }: FilePageClientProps) {
   const router = useRouter();
-  const { getToken } = useAuth();
 
   const [file, setFile] = useState<{
     name: string;
@@ -26,17 +25,10 @@ export default function FilePageClient({ id }: FilePageClientProps) {
 
   useEffect(() => {
     const fetchFile = async () => {
-      const token = await getToken();
-      if (!token) {
-        router.push("/home");
-        return;
-      }
-
       try {
         const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/file/view/${id}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          method: "GET",
+          credentials: "include",
         });
 
         if (!res.ok) throw new Error("File not found");
@@ -50,10 +42,15 @@ export default function FilePageClient({ id }: FilePageClientProps) {
     };
 
     fetchFile();
-  }, [id, getToken, router]);
+  }, []);
 
-  if (!file) return <div className="p-6">Loading...</div>;
-
+if (!file) {
+  return (
+    <div className="flex justify-center items-center h-screen w-full">
+      <Spinner />
+    </div>
+  );
+}
   const isImage = file.type.startsWith("image/");
   const isVideo = file.type.startsWith("video/");
   const isPDF = file.type === "application/pdf";

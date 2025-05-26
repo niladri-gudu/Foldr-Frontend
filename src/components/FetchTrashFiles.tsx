@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+"use client"
+
 import Link from "next/link";
 import {
   Table,
@@ -21,29 +24,11 @@ import {
   ContextMenuTrigger,
 } from "@/components/ui/context-menu";
 import FileActions from "./FileActions";
-import { auth } from "@clerk/nextjs/server";
+import { Spinner } from "./ui/spinner";
+import { useFileData } from "../hooks/useFileData";
 
-const FetchTrashFiles = async () => {
-  const { getToken } = await auth();
-  const token = await getToken();
-
-  let files = [];
-
-  try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/file/trash`, {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-      cache: 'no-store'
-    })
-
-    const data = await res.json()
-    files = data.files ?? []
-
-  } catch (error) {
-    console.error("Error fetching trash files:", error);
-  }
+const FetchTrashFiles = () => {
+  const { files, loading } = useFileData({ endpoint: '/file/trash' });
 
   const getFileIcon = (type: string) => {
     if (type.includes("folder")) return <Folder size={18} />;
@@ -91,14 +76,19 @@ const FetchTrashFiles = async () => {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {Array.isArray(files) && files.length === 0 ? (
+          {loading ? (
+            <TableRow>
+              <TableCell colSpan={5} className="text-center py-6">
+                <Spinner />
+              </TableCell>
+            </TableRow>
+          ) : files.length === 0 ? (
             <TableRow>
               <TableCell colSpan={5} className="text-center py-6">
                 No files found.
               </TableCell>
             </TableRow>
           ) : (
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             files.map((file: any, index: number) => (
               <ContextMenu key={file._id}>
                 <ContextMenuTrigger asChild>
@@ -127,6 +117,6 @@ const FetchTrashFiles = async () => {
         </TableBody>
       </Table>
     </div>
-  )
+  );
 }
 export default FetchTrashFiles

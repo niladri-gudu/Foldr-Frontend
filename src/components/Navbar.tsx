@@ -1,9 +1,9 @@
 "use client"
 
-import { UserButton } from "@clerk/nextjs"
 import { ModeToggle } from "./ModeToggle"
 import { SidebarTrigger } from "./ui/sidebar"
 import { usePathname } from "next/navigation"
+import UserButton from "./UserButton"
 
 const Navbar = () => {
 
