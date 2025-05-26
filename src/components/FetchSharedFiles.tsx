@@ -89,7 +89,9 @@ const FetchSharedFiles = () => {
               </TableCell>
             </TableRow>
           ) : (
-            files.map((sharedFile: any, index: number) => {
+            files
+            .filter((sharedFile: any) => sharedFile.fileId !== null)
+            .map((sharedFile: any, index: number) => {
               const file = sharedFile.fileId;
               const sharer = sharedFile.sharedBy;
 
