@@ -1,6 +1,6 @@
 "use client";
 
-import { Home, Star, Share, Trash } from "lucide-react";
+import { Home, Star, Share, Trash, FolderOpen } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -13,8 +13,6 @@ import {
   SidebarSeparator,
 } from "./ui/sidebar";
 import Link from "next/link";
-import Image from "next/image";
-import logo from "../../public/file.svg";
 import { usePathname } from "next/navigation";
 
 const items = [
@@ -53,10 +51,10 @@ const AppSidebar = () => {
               asChild
               className="flex items-center gap-2 w-full"
             >
-              <Link href="/home">
-                <Image src={logo} alt="logo" width={25} />
-                <span className="text-2xl font-semibold">N-Drive</span>
-              </Link>
+            <Link href="/home" className="flex items-center space-x-2">
+              <FolderOpen className="h-8 w-8 text-primary" />
+              <span className="text-2xl font-bold">Foldr</span>
+            </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>

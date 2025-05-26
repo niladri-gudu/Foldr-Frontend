@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+"use client"
+
 import Link from "next/link";
 import {
   Table,
@@ -21,29 +24,11 @@ import {
   ContextMenuTrigger,
 } from "@/components/ui/context-menu";
 import FileActions from "./FileActions";
-import { auth } from "@clerk/nextjs/server";
+import { Spinner } from "./ui/spinner";
+import { useFileData } from "../hooks/useFileData";
 
-const FetchSharedFiles = async () => {
-  const { getToken } = await auth()
-  const token = await getToken()
-
-  let files = []
-
-  try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/file/shared`,{
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-    })
-
-    const data = await res.json()
-    files = data.sharedWithMe ?? []
-
-  } catch (error) {
-    console.error("Error fetching shared files:", error);
-  }
+const FetchSharedFiles = () => {
+  const { files, loading } = useFileData({ endpoint: '/file/shared', dataKey: 'sharedWithMe' });
 
   const getFileIcon = (type: string) => {
     if (type.includes("folder")) return <Folder size={18} />;
@@ -91,48 +76,52 @@ const FetchSharedFiles = async () => {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {Array.isArray(files) && files.length === 0 ? (
+          {loading ? (
+            <TableRow>
+              <TableCell colSpan={5} className="text-center py-6">
+                <Spinner />
+              </TableCell>
+            </TableRow>
+          ) : files.length === 0 ? (
             <TableRow>
               <TableCell colSpan={5} className="text-center py-6">
                 No files found.
               </TableCell>
             </TableRow>
           ) : (
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             files.map((sharedFile: any, index: number) => {
               const file = sharedFile.fileId;
               const sharer = sharedFile.sharedBy;
 
               return (
                 <ContextMenu key={file._id}>
-                <ContextMenuTrigger asChild>
-                  <TableRow className="hover:bg-accent/50 cursor-pointer">
-                    <TableCell className="text-center">{index + 1}</TableCell>
-                    <TableCell>
-                      <Link
-                        href={`/file/${file._id}`}
-                        className="flex items-center gap-2 max-w-[200px] truncate hover:underline"
+                  <ContextMenuTrigger asChild>
+                    <TableRow className="hover:bg-accent/50 cursor-pointer">
+                      <TableCell className="text-center">{index + 1}</TableCell>
+                      <TableCell>
+                        <Link
+                          href={`/file/${file._id}`}
+                          className="flex items-center gap-2 max-w-[200px] truncate hover:underline"
                         >
-                        <span className="shrink-0">{getFileIcon(file.type)}</span>
-                        <span className="truncate">{file.name}</span>
-                      </Link>
-                    </TableCell>
-                    <TableCell className="truncate">{file.type}</TableCell>
-                    <TableCell className="truncate">{sharer?.name ?? "Unknown"}</TableCell>
-                    <TableCell className="text-right">
-                      {formatFileSize(file.size)}
-                    </TableCell>
-                  </TableRow>
-                </ContextMenuTrigger>
-                <FileActions file={file} />
-              </ContextMenu>
-            )
-          } 
-          )
+                          <span className="shrink-0">{getFileIcon(file.type)}</span>
+                          <span className="truncate">{file.name}</span>
+                        </Link>
+                      </TableCell>
+                      <TableCell className="truncate">{file.type}</TableCell>
+                      <TableCell className="truncate">{sharer?.name ?? "Unknown"}</TableCell>
+                      <TableCell className="text-right">
+                        {formatFileSize(file.size)}
+                      </TableCell>
+                    </TableRow>
+                  </ContextMenuTrigger>
+                  <FileActions file={file} />
+                </ContextMenu>
+              );
+            })
           )}
         </TableBody>
       </Table>
     </div>
-  )
+  );
 }
 export default FetchSharedFiles

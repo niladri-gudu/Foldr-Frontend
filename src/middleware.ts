@@ -1,15 +1,21 @@
-import { clerkMiddleware } from '@clerk/nextjs/server'
+import { NextResponse } from 'next/server'
+import type { NextRequest } from 'next/server'
 
-export default clerkMiddleware({
-  afterSignInUrl: "/home",
-  afterSignUpUrl: "/home"
-})
+const protectedRoutes = ['/home', '/shared', '/trash', '/starred', '/file']
+
+export function middleware(request: NextRequest) {
+  const token = request.cookies.get('token')?.value
+
+  const isProtected = protectedRoutes.some(route => request.nextUrl.pathname.startsWith(route))
+
+  if (isProtected && !token) {
+    const signInUrl = new URL('/sign-in', request.url)
+    return NextResponse.redirect(signInUrl)
+  }
+
+  return NextResponse.next()
+}
 
 export const config = {
-  matcher: [
-    // Skip Next.js internals and all static files, unless found in search params
-    '/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)',
-    // Always run for API routes
-    '/(api|trpc)(.*)',
-  ],
+  matcher: ['/home/:path*', '/shared/:path*', '/starred/:path*', '/trash/:path*', '/file/:path*'],
 }
