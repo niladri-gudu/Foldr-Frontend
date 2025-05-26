@@ -53,7 +53,6 @@ export function SignupForm({
         throw new Error(data.message || "Something went wrong")
       } else {
         router.push("/sign-in ")
-        // alert("Account created successfully! Please log in.")
       }
 
     } catch (error) {
