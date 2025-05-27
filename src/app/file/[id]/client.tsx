@@ -26,7 +26,7 @@ export default function FilePageClient({ id }: FilePageClientProps) {
   useEffect(() => {
     const fetchFile = async () => {
       try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/file/view/${id}`, {
+        const res = await fetch(`api/file/view/${id}`, {
           method: "GET",
           credentials: "include",
         });

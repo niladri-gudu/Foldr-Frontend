@@ -75,7 +75,7 @@ export default function FileActions({ file }: { file: any }) {
   const validateUser = async () => {
     try {
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/file/shared/validate`,
+        `api/file/shared/validate`,
         {
           method: "POST",
           credentials: "include",

@@ -13,7 +13,7 @@ export const useFileData = ({ endpoint, dataKey = 'files' }: UseFileDataProps) =
   const fetchFiles = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}${endpoint}`, {
+      const res = await fetch(`api${endpoint}`, {
         method: "GET",
         credentials: "include",
       });
