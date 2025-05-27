@@ -15,7 +15,7 @@ const UserButton = () => {
 
   const handleLogout = async () => {
     try {
-      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/logout`, {
+      await fetch(`api/auth/logout`, {
         method: "POST",
         credentials: "include",
       })
