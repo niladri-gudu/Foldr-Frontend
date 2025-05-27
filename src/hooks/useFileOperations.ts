@@ -18,7 +18,7 @@ export const useFileOperations = ({ onSuccess }: UseFileOperationsProps = {}) =>
   const starFile = useCallback(async (fileId: string, isStarred: boolean) => {
     try {
       const res = await fetch(
-        `api/file/starred/${fileId}`,
+        `/api/file/starred/${fileId}`,
         {
           method: "POST",
           credentials: "include",
@@ -43,7 +43,7 @@ export const useFileOperations = ({ onSuccess }: UseFileOperationsProps = {}) =>
   const trashFile = useCallback(async (fileId: string) => {
     try {
       const res = await fetch(
-        `api/file/trash/${fileId}`,
+        `/api/file/trash/${fileId}`,
         {
           method: "POST",
           credentials: "include",
@@ -66,7 +66,7 @@ export const useFileOperations = ({ onSuccess }: UseFileOperationsProps = {}) =>
   const deleteFile = useCallback(async (fileId: string) => {
     try {
       const res = await fetch(
-        `api/file/delete/${fileId}`,
+        `/api/file/delete/${fileId}`,
         {
           method: "DELETE",
           credentials: "include",
@@ -89,7 +89,7 @@ export const useFileOperations = ({ onSuccess }: UseFileOperationsProps = {}) =>
   const restoreFile = useCallback(async (fileId: string) => {
     try {
       const res = await fetch(
-        `api/file/restore/${fileId}`,
+        `/api/file/restore/${fileId}`,
         {
           method: "POST",
           credentials: "include"
@@ -112,7 +112,7 @@ export const useFileOperations = ({ onSuccess }: UseFileOperationsProps = {}) =>
   const shareFile = useCallback(async (fileId: string, email: string) => {
     try {
       const res = await fetch(
-        `api/file/shared/${fileId}`,
+        `/api/file/shared/${fileId}`,
         {
           method: "POST",
           credentials: "include",
@@ -140,7 +140,7 @@ export const useFileOperations = ({ onSuccess }: UseFileOperationsProps = {}) =>
   const removeSharedFile = useCallback(async (fileId: string) => {
     try {
       const res = await fetch(
-        `api/file/shared/remove/${fileId}`,
+        `/api/file/shared/remove/${fileId}`,
         {
           method: "POST",
           credentials: "include"
@@ -165,7 +165,7 @@ export const useFileOperations = ({ onSuccess }: UseFileOperationsProps = {}) =>
     formData.append('file', file);
 
     try {
-      const res = await fetch(`api/file/upload`, {
+      const res = await fetch(`/api/file/upload`, {
         method: 'POST',
         body: formData,
         credentials: 'include',
