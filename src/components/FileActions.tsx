@@ -75,7 +75,7 @@ export default function FileActions({ file }: { file: any }) {
   const validateUser = async () => {
     try {
       const res = await fetch(
-        `api/file/shared/validate`,
+        `/api/file/shared/validate`,
         {
           method: "POST",
           credentials: "include",
