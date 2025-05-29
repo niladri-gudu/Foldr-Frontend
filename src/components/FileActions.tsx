@@ -23,9 +23,7 @@ export default function FileActions({ file }: { file: any }) {
   const pathname = usePathname();
 
   const [open, setOpen] = useState(false);
-  const [dialogMode, setDialogMode] = useState<
-    "trash" | "delete" | "share" | "remove" | null
-  >(null);
+  const [dialogMode, setDialogMode] = useState<"trash" | "delete" | "share" | "remove" | null>(null);
   const [isUserValid, setIsUserValid] = useState(false);
   const [email, setEmail] = useState("");
   const [validationResult, setValidationResult] = useState<string | null>(null);
@@ -46,45 +44,34 @@ export default function FileActions({ file }: { file: any }) {
 
   const handleStarred = async () => {
     const success = await starFile(fileId, isStarred);
-    if (success) {
-      setOpen(false);
-    }
+    if (success) setOpen(false);
   };
 
   const handleRestore = async () => {
     const success = await restoreFile(fileId);
-    if (success) {
-      setOpen(false);
-    }
+    if (success) setOpen(false);
   };
 
   const handleTrash = async () => {
     const success = await trashFile(fileId);
-    if (success) {
-      setOpen(false);
-    }
+    if (success) setOpen(false);
   };
 
   const handleDelete = async () => {
     const success = await deleteFile(fileId);
-    if (success) {
-      setOpen(false);
-    }
+    if (success) setOpen(false);
   };
 
   const validateUser = async () => {
     try {
-      const res = await fetch(
-        `/api/file/shared/validate`,
-        {
-          method: "POST",
-          credentials: "include",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ email }),
-        }
-      );
+      const res = await fetch(`/api/file/shared/validate`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email }),
+      });
       const data = await res.json();
 
       if (res.ok) {
@@ -99,7 +86,7 @@ export default function FileActions({ file }: { file: any }) {
       }
     } catch (error) {
       setValidationResult("Error validating user");
-      console.log("Error validating user:", error);
+      console.error("Error validating user:", error);
     }
   };
 
@@ -114,15 +101,20 @@ export default function FileActions({ file }: { file: any }) {
 
   const handleSharedRemove = async () => {
     const success = await removeSharedFile(fileId);
-    if (success) {
-      setOpen(false);
-    }
+    if (success) setOpen(false);
   };
+
+  const baseItem =
+    "cursor-pointer flex items-center gap-2 px-3 py-2 rounded-md transition-colors";
+  const defaultItem =
+    "text-gray-700 hover:bg-indigo-100 dark:text-gray-200 dark:hover:bg-gray-700";
+  const dangerItem =
+    "text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900 dark:hover:text-gray-200";
 
   return (
     <>
       <Dialog open={open} onOpenChange={setOpen}>
-        <ContextMenuContent>
+        <ContextMenuContent className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-1">
           {(pathname === "/home" ||
             pathname === "/starred" ||
             pathname === "/shared") && (
@@ -131,7 +123,7 @@ export default function FileActions({ file }: { file: any }) {
                 <>
                   <ContextMenuItem
                     onClick={handleStarred}
-                    className="cursor-pointer"
+                    className={`${baseItem} ${defaultItem}`}
                   >
                     <Star />
                     <span>
@@ -141,7 +133,7 @@ export default function FileActions({ file }: { file: any }) {
                   <DialogTrigger asChild>
                     <ContextMenuItem
                       onClick={() => openDialog("share")}
-                      className="cursor-pointer"
+                      className={`${baseItem} ${defaultItem}`}
                     >
                       <Share />
                       <span>Share with Others</span>
@@ -150,7 +142,7 @@ export default function FileActions({ file }: { file: any }) {
                   <DialogTrigger asChild>
                     <ContextMenuItem
                       onClick={() => openDialog("trash")}
-                      className="cursor-pointer text-red-500"
+                      className={`${baseItem} ${dangerItem}`}
                     >
                       <Trash2 />
                       <span>Move to Trash</span>
@@ -159,7 +151,7 @@ export default function FileActions({ file }: { file: any }) {
                   <DialogTrigger asChild>
                     <ContextMenuItem
                       onClick={() => openDialog("delete")}
-                      className="cursor-pointer text-red-500"
+                      className={`${baseItem} ${dangerItem}`}
                     >
                       <Trash2 />
                       <span>Delete Permanently</span>
@@ -171,7 +163,7 @@ export default function FileActions({ file }: { file: any }) {
                 <DialogTrigger asChild>
                   <ContextMenuItem
                     onClick={() => openDialog("remove")}
-                    className="cursor-pointer text-red-500"
+                    className={`${baseItem} ${dangerItem}`}
                   >
                     <Trash2 />
                     <span>Remove from shared</span>
@@ -180,12 +172,11 @@ export default function FileActions({ file }: { file: any }) {
               )}
             </>
           )}
-
           {pathname === "/trash" && (
             <>
               <ContextMenuItem
                 onClick={handleRestore}
-                className="cursor-pointer"
+                className={`${baseItem} ${defaultItem}`}
               >
                 <ArchiveRestore />
                 <span>Remove from Trash</span>
@@ -193,7 +184,7 @@ export default function FileActions({ file }: { file: any }) {
               <DialogTrigger asChild>
                 <ContextMenuItem
                   onClick={() => openDialog("delete")}
-                  className="cursor-pointer text-red-500"
+                  className={`${baseItem} ${dangerItem}`}
                 >
                   <Trash2 />
                   <span>Delete Permanently</span>
@@ -203,7 +194,7 @@ export default function FileActions({ file }: { file: any }) {
           )}
         </ContextMenuContent>
 
-        <DialogContent>
+        <DialogContent className="bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 rounded-xl border border-gray-200 dark:border-gray-700 shadow-lg p-6 space-y-4">
           {dialogMode === "trash" && (
             <>
               <DialogHeader>
@@ -213,18 +204,10 @@ export default function FileActions({ file }: { file: any }) {
                 </DialogDescription>
               </DialogHeader>
               <div className="flex justify-end gap-4 pt-4">
-                <Button
-                  variant="outline"
-                  onClick={() => setOpen(false)}
-                  className="cursor-pointer"
-                >
+                <Button variant="outline" onClick={() => setOpen(false)}>
                   Cancel
                 </Button>
-                <Button
-                  variant="destructive"
-                  onClick={handleTrash}
-                  className="cursor-pointer"
-                >
+                <Button variant="destructive" onClick={handleTrash}>
                   Confirm
                 </Button>
               </div>
@@ -240,18 +223,10 @@ export default function FileActions({ file }: { file: any }) {
                 </DialogDescription>
               </DialogHeader>
               <div className="flex justify-end gap-4 pt-4">
-                <Button
-                  variant="outline"
-                  onClick={() => setOpen(false)}
-                  className="cursor-pointer"
-                >
+                <Button variant="outline" onClick={() => setOpen(false)}>
                   Cancel
                 </Button>
-                <Button
-                  variant="destructive"
-                  onClick={handleDelete}
-                  className="cursor-pointer"
-                >
+                <Button variant="destructive" onClick={handleDelete}>
                   Confirm
                 </Button>
               </div>
@@ -267,18 +242,10 @@ export default function FileActions({ file }: { file: any }) {
                 </DialogDescription>
               </DialogHeader>
               <div className="flex justify-end gap-4 pt-4">
-                <Button
-                  variant="outline"
-                  onClick={() => setOpen(false)}
-                  className="cursor-pointer"
-                >
+                <Button variant="outline" onClick={() => setOpen(false)}>
                   Cancel
                 </Button>
-                <Button
-                  variant="destructive"
-                  onClick={handleSharedRemove}
-                  className="cursor-pointer"
-                >
+                <Button variant="destructive" onClick={handleSharedRemove}>
                   Confirm
                 </Button>
               </div>
@@ -302,29 +269,24 @@ export default function FileActions({ file }: { file: any }) {
                     setValidationResult(null);
                     setIsUserValid(false);
                   }}
+                  className="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
                 />
                 {validationResult && (
                   <p
                     className={`text-sm ${
-                      isUserValid ? "text-green-600" : "text-red-600"
+                      isUserValid
+                        ? "text-green-600 dark:text-green-400"
+                        : "text-red-600 dark:text-red-400"
                     }`}
                   >
                     {validationResult}
                   </p>
                 )}
                 <div className="flex justify-end gap-4 pt-2">
-                  <Button
-                    variant="secondary"
-                    onClick={validateUser}
-                    className="cursor-pointer"
-                  >
+                  <Button variant="secondary" onClick={validateUser}>
                     Validate User
                   </Button>
-                  <Button
-                    onClick={handleShare}
-                    disabled={!isUserValid}
-                    className="cursor-pointer"
-                  >
+                  <Button onClick={handleShare} disabled={!isUserValid}>
                     Share
                   </Button>
                 </div>

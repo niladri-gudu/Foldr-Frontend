@@ -120,3 +120,7 @@
     @apply bg-background text-foreground;
   }
 }
+
+body {
+  @apply text-gray-800 dark:text-gray-200 bg-background antialiased transition-colors duration-300;
+}

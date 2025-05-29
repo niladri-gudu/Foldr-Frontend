@@ -1,4 +1,3 @@
-// app/file/[id]/client.tsx
 "use client";
 
 import { useEffect, useState } from "react";
@@ -44,38 +43,45 @@ export default function FilePageClient({ id }: FilePageClientProps) {
     fetchFile();
   }, []);
 
-if (!file) {
-  return (
-    <div className="flex justify-center items-center h-screen w-full">
-      <Spinner />
-    </div>
-  );
-}
+  if (!file) {
+    return (
+      <div className="flex justify-center items-center h-screen w-full bg-white dark:bg-black">
+        <Spinner />
+      </div>
+    );
+  }
+
   const isImage = file.type.startsWith("image/");
   const isVideo = file.type.startsWith("video/");
   const isPDF = file.type === "application/pdf";
   const isAudio = file.type.startsWith("audio/");
 
   return (
-    <div className="min-h-screen px-8 py-10 lg:px-16 xl:px-24 2xl:px-36">
+    <div className="min-h-screen bg-white dark:bg-black text-gray-900 dark:text-gray-100 px-6 py-10 sm:px-10 md:px-16 lg:px-24 xl:px-36">
       {/* Header */}
-      <div className="flex items-center justify-between mb-8">
-        <Button variant="outline" onClick={() => router.back()} className="cursor-pointer">
-          <ArrowLeft className="mr-2" /> Go Back
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8 gap-4">
+        <Button
+          variant="outline"
+          onClick={() => router.back()}
+          className="w-fit"
+        >
+          <ArrowLeft className="mr-2 h-4 w-4" /> Go Back
         </Button>
 
-        <div className="text-right max-w-xl">
-          <h1 className="text-3xl font-medium truncate">{file.name}</h1>
-          <p className="text-sm mt-1">
+        <div className="text-left sm:text-right max-w-xl truncate">
+          <h1 className="text-2xl sm:text-3xl font-semibold truncate">
+            {file.name}
+          </h1>
+          <p className="text-sm mt-1 text-gray-600 dark:text-gray-400">
             {file.type} • {(file.size / 1024 / 1024).toFixed(2)} MB
           </p>
         </div>
       </div>
 
       {/* File Preview */}
-      <div className="w-full flex justify-center items-center min-h-[500px] rounded-xl border p-6">
+      <div className="w-full flex justify-center items-center min-h-[400px] md:min-h-[500px] rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 p-6">
         {isImage && (
-          <div className="relative w-full h-[80vh] max-w-5xl">
+          <div className="relative w-full h-[70vh] max-w-5xl">
             <Image
               src={file.url}
               alt={file.name}
@@ -112,14 +118,17 @@ if (!file) {
         )}
 
         {!isImage && !isVideo && !isPDF && !isAudio && (
-          <a
-            href={file.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="underline"
-          >
-            Open File in New Tab
-          </a>
+          <div className="text-center">
+            <p className="mb-4">Preview not supported for this file type.</p>
+            <a
+              href={file.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-indigo-600 dark:text-indigo-400 underline hover:opacity-80 transition"
+            >
+              Open File in New Tab
+            </a>
+          </div>
         )}
       </div>
     </div>
