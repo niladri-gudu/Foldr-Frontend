@@ -14,8 +14,7 @@ const nextConfig: NextConfig = {
     return [
       {
         source: '/api/:path*',
-        // destination: 'https://foldr-backend.vercel.app/:path*',
-        destination: 'http://localhost:8000/:path*',
+        destination: 'https://foldr-backend.vercel.app/:path*',
       },
     ];
   },
