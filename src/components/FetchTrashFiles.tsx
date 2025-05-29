@@ -64,10 +64,10 @@ const FetchTrashFiles = () => {
   };
   
   return (
-    <div className="overflow-x-auto border rounded-md">
+<div className="overflow-x-auto border rounded-md shadow-sm bg-white dark:bg-gray-900">
       <Table>
-        <TableHeader className="bg-muted">
-          <TableRow>
+<TableHeader className="bg-indigo-50 dark:bg-gray-800 text-indigo-700 dark:text-indigo-300">
+<TableRow className="hover:bg-indigo-50 dark:hover:bg-gray-800 even:bg-white dark:even:bg-gray-900 transition-colors">
             <TableHead className="w-16 text-center">#</TableHead>
             <TableHead className="min-w-[220px]">Name</TableHead>
             <TableHead className="min-w-[180px]">Type</TableHead>
@@ -84,9 +84,9 @@ const FetchTrashFiles = () => {
             </TableRow>
           ) : files.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={5} className="text-center py-6">
-                No files found.
-              </TableCell>
+<TableCell colSpan={5} className="text-center py-6 text-muted-foreground dark:text-gray-400">
+  No files found.
+</TableCell>
             </TableRow>
           ) : (
             files.map((file: any, index: number) => (
@@ -99,7 +99,7 @@ const FetchTrashFiles = () => {
                         href={`/file/${file._id}`}
                         className="flex items-center gap-2 max-w-[200px] truncate hover:underline"
                       >
-                        <span className="shrink-0">{getFileIcon(file.type)}</span>
+<span className="shrink-0 text-indigo-500 dark:text-indigo-300">{getFileIcon(file.type)}</span>
                         <span className="truncate">{file.name}</span>
                       </Link>
                     </TableCell>

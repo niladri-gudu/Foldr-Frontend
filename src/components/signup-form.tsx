@@ -1,38 +1,37 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-"use client"
+"use client";
 
-import { useState } from "react"
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
+import { useState } from "react";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import Link from "next/link"
-import { useRouter } from "next/navigation"
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export function SignupForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
+  const router = useRouter();
 
-  const router = useRouter()
-
-  const [name, setName] = useState("")
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [error, setError] = useState("")
-  const [loading, setLoading] = useState(false)
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setError("")
-    setLoading(true)
+    e.preventDefault();
+    setError("");
+    setLoading(true);
 
     try {
       const res = await fetch(`/api/auth/register`, {
@@ -41,26 +40,21 @@ export function SignupForm({
           "Content-Type": "application/json",
         },
         credentials: "include",
-        body: JSON.stringify({
-          name,
-          email,
-          password,
-        }),
-      })
+        body: JSON.stringify({ name, email, password }),
+      });
 
-      const data = await res.json()
+      const data = await res.json();
       if (!res.ok) {
-        throw new Error(data.message || "Something went wrong")
-      } else {
-        router.push("/sign-in ")
+        throw new Error(data.message || "Something went wrong");
       }
 
+      router.push("/sign-in");
     } catch (error) {
-      setError("Failed to create an account. Please try again.")
+      setError("Failed to create an account. Please try again.");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
@@ -78,7 +72,7 @@ export function SignupForm({
                 <Label htmlFor="name">Name</Label>
                 <Input
                   id="name"
-                  type="name"
+                  type="text"
                   placeholder="Ramesh Kumar"
                   required
                   value={name}
@@ -98,26 +92,33 @@ export function SignupForm({
               </div>
               <div className="grid gap-3">
                 <Label htmlFor="password">Password</Label>
-                <Input 
-                  id="password" 
-                  type="password" 
+                <Input
+                  id="password"
+                  type="password"
                   required
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)} 
+                  onChange={(e) => setPassword(e.target.value)}
                 />
               </div>
               {error && (
                 <div className="text-red-500 text-sm text-center">{error}</div>
               )}
               <div className="flex flex-col gap-3 mt-2">
-                <Button type="submit" className="w-full cursor-pointer" disabled={loading} onClick={handleSubmit}>
-                  { loading ? "Signing Up..." : "Sign Up" }
+                <Button
+                  type="submit"
+                  className="w-full cursor-pointer"
+                  disabled={loading}
+                >
+                  {loading ? "Signing Up..." : "Sign Up"}
                 </Button>
               </div>
             </div>
             <div className="mt-4 text-center text-sm">
               Already have an account?{" "}
-              <Link href="/sign-in" className="underline underline-offset-4 cursor-pointer">
+              <Link
+                href="/sign-in"
+                className="underline underline-offset-4 cursor-pointer"
+              >
                 Log In
               </Link>
             </div>
@@ -125,5 +126,5 @@ export function SignupForm({
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

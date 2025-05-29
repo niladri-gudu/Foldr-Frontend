@@ -1,41 +1,41 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-"use client"
+"use client";
 
-import { useEffect, useState } from "react"
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { ModeToggle } from "@/components/ModeToggle"
-import { FolderOpen } from "lucide-react"
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { ModeToggle } from "@/components/ModeToggle";
+import Image from "next/image";
+import logo from "../../public/cloud_logo.png";
 
 export default function LandingPage() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false)
-  
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
   useEffect(() => {
     async function checkAuth() {
       try {
         const res = await fetch(`/api/auth/me`, {
           credentials: "include",
-        })
-        const data = await res.json()
+        });
+        const data = await res.json();
 
-        console.log(data)
-        setIsLoggedIn(data.isLoggedIn)
+        setIsLoggedIn(data.isLoggedIn);
       } catch (e) {
-        setIsLoggedIn(false)
+        setIsLoggedIn(false);
       }
     }
-    checkAuth()
-  }, [])
+    checkAuth();
+  }, []);
 
   return (
     <div className="flex min-h-screen flex-col bg-background text-foreground">
       {/* Navbar */}
-      <nav className="sticky top-0 z-50 border-b bg-background/80 backdrop-blur-lg">
+      <nav className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-md">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 items-center justify-between">
-            <Link href="/" className="flex items-center space-x-2">
-              <FolderOpen className="h-8 w-8 text-primary" />
-              <span className="text-2xl font-bold">Foldr</span>
+            <Link href="/" className="flex items-center gap-2">
+              <Image width={60} height={60} src={logo} alt="Foldr logo" />
+              <span className="text-2xl font-bold tracking-tight">Foldr</span>
             </Link>
 
             <div className="flex items-center space-x-4">
@@ -88,15 +88,17 @@ export default function LandingPage() {
       </section>
 
       {/* Footer */}
-      <footer className="border-t bg-muted/50">
+      <footer className="border-t border-border bg-muted/50">
         <div className="container mx-auto px-4 py-8 flex flex-col items-center justify-between gap-4 sm:flex-row">
           <div className="flex items-center space-x-2">
-            <FolderOpen className="h-6 w-6 text-primary" />
+            <Image width={30} height={30} src={logo} alt="Foldr logo" />
             <span className="text-lg font-semibold">Foldr</span>
           </div>
-          <p className="text-sm text-muted-foreground">Made with ❤️ by nILADRI.</p>
+          <p className="text-sm text-muted-foreground">
+            Made with ❤️ by nILADRI.
+          </p>
         </div>
       </footer>
     </div>
-  )
+  );
 }
