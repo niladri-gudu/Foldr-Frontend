@@ -4,6 +4,8 @@ import { toast } from 'sonner';
 
 const CHUNK_SIZE = 5 * 1024 * 1024; // 5MB chunks
 
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || '';
+
 interface UseFileOperationsProps {
   onSuccess?: () => void;
 }
@@ -40,7 +42,7 @@ export const useFileOperations = ({ onSuccess }: UseFileOperationsProps = {}) =>
 
   const starFile = useCallback(async (fileId: string, isStarred: boolean) => {
     try {
-      const res = await fetch(`/api/file/starred/${fileId}`, {
+      const res = await fetch(`${API_BASE}/api/file/starred/${fileId}`, {
         method: "POST",
         credentials: "include",
       });
@@ -60,7 +62,7 @@ export const useFileOperations = ({ onSuccess }: UseFileOperationsProps = {}) =>
 
   const trashFile = useCallback(async (fileId: string) => {
     try {
-      const res = await fetch(`/api/file/trash/${fileId}`, {
+      const res = await fetch(`${API_BASE}/api/file/trash/${fileId}`, {
         method: "POST",
         credentials: "include",
       });
@@ -80,7 +82,7 @@ export const useFileOperations = ({ onSuccess }: UseFileOperationsProps = {}) =>
 
   const deleteFile = useCallback(async (fileId: string) => {
     try {
-      const res = await fetch(`/api/file/delete/${fileId}`, {
+      const res = await fetch(`${API_BASE}/api/file/delete/${fileId}`, {
         method: "DELETE",
         credentials: "include",
       });
@@ -100,7 +102,7 @@ export const useFileOperations = ({ onSuccess }: UseFileOperationsProps = {}) =>
 
   const restoreFile = useCallback(async (fileId: string) => {
     try {
-      const res = await fetch(`/api/file/restore/${fileId}`, {
+      const res = await fetch(`${API_BASE}/api/file/restore/${fileId}`, {
         method: "POST",
         credentials: "include",
       });
@@ -120,7 +122,7 @@ export const useFileOperations = ({ onSuccess }: UseFileOperationsProps = {}) =>
 
   const shareFile = useCallback(async (fileId: string, email: string) => {
     try {
-      const res = await fetch(`/api/file/shared/${fileId}`, {
+      const res = await fetch(`${API_BASE}/api/file/shared/${fileId}`, {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
@@ -143,7 +145,7 @@ export const useFileOperations = ({ onSuccess }: UseFileOperationsProps = {}) =>
 
   const removeSharedFile = useCallback(async (fileId: string) => {
     try {
-      const res = await fetch(`/api/file/shared/${fileId}`, {
+      const res = await fetch(`${API_BASE}/api/file/shared/${fileId}`, {
         method: "DELETE",
         credentials: "include",
       });
@@ -163,9 +165,8 @@ export const useFileOperations = ({ onSuccess }: UseFileOperationsProps = {}) =>
 
   // ------------- Chunked upload helpers -------------
 
-  // 1. Initiate upload - get uploadId and S3 key from backend
   const initiateChunkedUpload = useCallback(async (fileName: string, fileSize: number, totalChunks: number) => {
-    const response = await fetch('/api/file/initiate-upload', {
+    const response = await fetch(`${API_BASE}/api/file/initiate-upload`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
@@ -180,9 +181,8 @@ export const useFileOperations = ({ onSuccess }: UseFileOperationsProps = {}) =>
     return await response.json(); // { uploadId, key }
   }, []);
 
-  // 2. Get signed URL for chunk from backend
   const getUploadUrlForChunk = useCallback(async (uploadId: string, chunkIndex: number) => {
-    const response = await fetch('/api/file/get-upload-url', {
+    const response = await fetch(`${API_BASE}/api/file/get-upload-url`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
@@ -197,7 +197,6 @@ export const useFileOperations = ({ onSuccess }: UseFileOperationsProps = {}) =>
     return await response.json(); // { url, partNumber }
   }, []);
 
-  // 3. Upload chunk directly to S3 using signed URL
   const uploadChunkToS3 = useCallback(async (signedUrl: string, chunk: Blob) => {
     const response = await fetch(signedUrl, {
       method: 'PUT',
@@ -214,9 +213,8 @@ export const useFileOperations = ({ onSuccess }: UseFileOperationsProps = {}) =>
     return etag;
   }, []);
 
-  // 4. Mark chunk as uploaded on backend with ETag info
   const markChunkUploaded = useCallback(async (uploadId: string, chunkIndex: number, etag: string) => {
-    const response = await fetch('/api/file/mark-chunk-uploaded', {
+    const response = await fetch(`${API_BASE}/api/file/mark-chunk-uploaded`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
@@ -231,9 +229,8 @@ export const useFileOperations = ({ onSuccess }: UseFileOperationsProps = {}) =>
     return await response.json();
   }, []);
 
-  // 5. Complete multipart upload (tells backend to finalize)
   const completeChunkedUpload = useCallback(async (uploadId: string, fileName: string) => {
-    const response = await fetch('/api/file/complete-upload', {
+    const response = await fetch(`${API_BASE}/api/file/complete-upload`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
@@ -248,11 +245,10 @@ export const useFileOperations = ({ onSuccess }: UseFileOperationsProps = {}) =>
     return await response.json();
   }, []);
 
-  // 6. Cancel upload
   const cancelChunkedUpload = useCallback(async (uploadId: string) => {
     if (!uploadId) return;
 
-    await fetch('/api/file/cancel-upload', {
+    await fetch(`${API_BASE}/api/file/cancel-upload`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
@@ -275,18 +271,15 @@ export const useFileOperations = ({ onSuccess }: UseFileOperationsProps = {}) =>
         isUploading: true,
       });
 
-      // Step 1: Initiate upload
       const { uploadId } = await initiateChunkedUpload(file.name, file.size, totalChunks);
 
       setChunkedUploadState(prev => ({ ...prev, uploadId }));
 
       for (let chunkIndex = 0; chunkIndex < totalChunks; chunkIndex++) {
-        // Pause check
         while (uploadStateRef.current.isPaused) {
           await new Promise(r => setTimeout(r, 100));
         }
 
-        // Cancel check
         if (!uploadStateRef.current.isUploading) {
           toast.error('Upload cancelled');
           return false;
@@ -296,16 +289,12 @@ export const useFileOperations = ({ onSuccess }: UseFileOperationsProps = {}) =>
         const end = Math.min(start + CHUNK_SIZE, file.size);
         const chunk = file.slice(start, end);
 
-        // Step 2: Get signed URL for this chunk
         const { url } = await getUploadUrlForChunk(uploadId, chunkIndex);
 
-        // Step 3: Upload chunk to S3
         const etag = await uploadChunkToS3(url, chunk);
 
-        // Step 4: Mark chunk uploaded with ETag on backend
         await markChunkUploaded(uploadId, chunkIndex, etag);
 
-        // Update progress
         const progress = Math.round(((chunkIndex + 1) / totalChunks) * 100);
         setChunkedUploadState(prev => ({
           ...prev,
@@ -314,7 +303,6 @@ export const useFileOperations = ({ onSuccess }: UseFileOperationsProps = {}) =>
         }));
       }
 
-      // Step 5: Complete upload
       await completeChunkedUpload(uploadId, file.name);
 
       toast.success('Upload completed successfully');
@@ -346,13 +334,12 @@ export const useFileOperations = ({ onSuccess }: UseFileOperationsProps = {}) =>
 
   // ------------- Smart upload chooses chunked or regular -------------
 
-  // Regular (simple) upload fallback for small files (optional)
   const uploadFile = useCallback(async (file: File) => {
     const formData = new FormData();
     formData.append('file', file);
 
     try {
-      const res = await fetch('/api/file/upload', {
+      const res = await fetch(`${API_BASE}/api/file/upload`, {
         method: 'POST',
         body: formData,
         credentials: 'include',
@@ -381,7 +368,6 @@ export const useFileOperations = ({ onSuccess }: UseFileOperationsProps = {}) =>
     }
   }, [uploadFileChunked, uploadFile]);
 
-  // Pause, resume, cancel controls
   const pauseChunkedUpload = useCallback(() => {
     setChunkedUploadState(prev => ({ ...prev, isPaused: true }));
   }, []);
@@ -413,17 +399,14 @@ export const useFileOperations = ({ onSuccess }: UseFileOperationsProps = {}) =>
     shareFile,
     removeSharedFile,
 
-    // Upload functions
     uploadFile,
     uploadFileChunked,
     smartUpload,
 
-    // Controls
     pauseChunkedUpload,
     resumeChunkedUpload,
     cancelUpload,
 
-    // Upload state
     chunkedUploadState,
   };
 };
