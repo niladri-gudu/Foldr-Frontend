@@ -2,7 +2,7 @@
 import { useCallback, useState, useRef } from 'react';
 import { toast } from 'sonner';
 
-const CHUNK_SIZE = 5 * 1024 * 1024; // 5MB chunks
+const CHUNK_SIZE = 3 * 1024 * 1024;
 
 interface UseFileOperationsProps {
   onSuccess?: () => void;
