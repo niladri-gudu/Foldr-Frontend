@@ -2,7 +2,7 @@
 import { useCallback, useState, useRef } from 'react';
 import { toast } from 'sonner';
 
-const CHUNK_SIZE = 3 * 1024 * 1024;
+const CHUNK_SIZE = 5 * 1024 * 1024; // 5MB chunks
 
 interface UseFileOperationsProps {
   onSuccess?: () => void;
@@ -27,38 +27,32 @@ export const useFileOperations = ({ onSuccess }: UseFileOperationsProps = {}) =>
     isUploading: false,
   });
 
-  // Use refs to track current state in async functions
+  // Ref to keep latest state inside async loops
   const uploadStateRef = useRef(chunkedUploadState);
   uploadStateRef.current = chunkedUploadState;
 
   const refreshFiles = useCallback(() => {
-    if (onSuccess) {
-      onSuccess();
-    }
-    // Trigger a custom event that all file components can listen to
+    if (onSuccess) onSuccess();
     window.dispatchEvent(new CustomEvent('filesChanged'));
   }, [onSuccess]);
 
+  // ------------- File Operations -------------
+
   const starFile = useCallback(async (fileId: string, isStarred: boolean) => {
     try {
-      const res = await fetch(
-        `/api/file/starred/${fileId}`,
-        {
-          method: "POST",
-          credentials: "include",
-        }
-      );
+      const res = await fetch(`/api/file/starred/${fileId}`, {
+        method: "POST",
+        credentials: "include",
+      });
       if (res.ok) {
-        toast.success(
-          isStarred ? "Removed from favorites" : "Marked as favorite"
-        );
+        toast.success(isStarred ? "Removed from favorites" : "Marked as favorite");
         refreshFiles();
         return true;
       } else {
         toast.error("Failed to update favorite status");
         return false;
       }
-    } catch (error) {
+    } catch {
       toast.error("An error occurred while updating favorite status");
       return false;
     }
@@ -66,13 +60,10 @@ export const useFileOperations = ({ onSuccess }: UseFileOperationsProps = {}) =>
 
   const trashFile = useCallback(async (fileId: string) => {
     try {
-      const res = await fetch(
-        `/api/file/trash/${fileId}`,
-        {
-          method: "POST",
-          credentials: "include",
-        }
-      );
+      const res = await fetch(`/api/file/trash/${fileId}`, {
+        method: "POST",
+        credentials: "include",
+      });
       if (res.ok) {
         toast.success("File moved to trash");
         refreshFiles();
@@ -81,7 +72,7 @@ export const useFileOperations = ({ onSuccess }: UseFileOperationsProps = {}) =>
         toast.error("Failed to move file to trash");
         return false;
       }
-    } catch (error) {
+    } catch {
       toast.error("An error occurred while moving file to trash");
       return false;
     }
@@ -89,13 +80,10 @@ export const useFileOperations = ({ onSuccess }: UseFileOperationsProps = {}) =>
 
   const deleteFile = useCallback(async (fileId: string) => {
     try {
-      const res = await fetch(
-        `/api/file/delete/${fileId}`,
-        {
-          method: "DELETE",
-          credentials: "include",
-        }
-      );
+      const res = await fetch(`/api/file/delete/${fileId}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
       if (res.ok) {
         toast.success("File deleted permanently");
         refreshFiles();
@@ -104,7 +92,7 @@ export const useFileOperations = ({ onSuccess }: UseFileOperationsProps = {}) =>
         toast.error("Failed to delete file");
         return false;
       }
-    } catch (error) {
+    } catch {
       toast.error("An error occurred while deleting the file");
       return false;
     }
@@ -112,13 +100,10 @@ export const useFileOperations = ({ onSuccess }: UseFileOperationsProps = {}) =>
 
   const restoreFile = useCallback(async (fileId: string) => {
     try {
-      const res = await fetch(
-        `/api/file/restore/${fileId}`,
-        {
-          method: "POST",
-          credentials: "include"
-        }
-      );
+      const res = await fetch(`/api/file/restore/${fileId}`, {
+        method: "POST",
+        credentials: "include",
+      });
       if (res.ok) {
         toast.success("File restored from trash");
         refreshFiles();
@@ -127,7 +112,7 @@ export const useFileOperations = ({ onSuccess }: UseFileOperationsProps = {}) =>
         toast.error("Failed to restore file");
         return false;
       }
-    } catch (error) {
+    } catch {
       toast.error("An error occurred while restoring the file");
       return false;
     }
@@ -135,17 +120,12 @@ export const useFileOperations = ({ onSuccess }: UseFileOperationsProps = {}) =>
 
   const shareFile = useCallback(async (fileId: string, email: string) => {
     try {
-      const res = await fetch(
-        `/api/file/shared/${fileId}`,
-        {
-          method: "POST",
-          credentials: "include",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ email }),
-        }
-      );
+      const res = await fetch(`/api/file/shared/${fileId}`, {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
       const data = await res.json();
       if (res.ok) {
         toast.success("File shared successfully");
@@ -155,7 +135,7 @@ export const useFileOperations = ({ onSuccess }: UseFileOperationsProps = {}) =>
         toast.error(data.message || "Failed to share file");
         return { success: false, error: data.message };
       }
-    } catch (error) {
+    } catch {
       toast.error("An error occurred while sharing the file");
       return { success: false, error: "Network error" };
     }
@@ -163,13 +143,10 @@ export const useFileOperations = ({ onSuccess }: UseFileOperationsProps = {}) =>
 
   const removeSharedFile = useCallback(async (fileId: string) => {
     try {
-      const res = await fetch(
-        `/api/file/shared/${fileId}`,
-        {
-          method: "DELETE",
-          credentials: "include"
-        }
-      );
+      const res = await fetch(`/api/file/shared/${fileId}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
       if (res.ok) {
         toast.success("File removed from shared");
         refreshFiles();
@@ -178,212 +155,233 @@ export const useFileOperations = ({ onSuccess }: UseFileOperationsProps = {}) =>
         toast.error("Failed to remove file from shared");
         return false;
       }
-    } catch (error) {
+    } catch {
       toast.error("An error occurred while removing file from shared");
       return false;
     }
   }, [refreshFiles]);
 
-  // Original upload function for backward compatibility (small files)
-  const uploadFile = useCallback(async (file: File) => {
-    const formData = new FormData();
-    formData.append('file', file);
+  // ------------- Chunked upload helpers -------------
 
-    try {
-      const res = await fetch(`/api/file/upload`, {
-        method: 'POST',
-        body: formData,
-        credentials: 'include',
-      });
-
-      if (res.ok) {
-        toast.success("Upload successful");
-        refreshFiles();
-        return true;
-      } else {
-        toast.error("Upload failed");
-        return false;
-      }
-    } catch (error) {
-      toast.error("Upload failed");
-      return false;
-    }
-  }, [refreshFiles]);
-
-  // Chunked upload functions
+  // 1. Initiate upload - get uploadId and S3 key from backend
   const initiateChunkedUpload = useCallback(async (fileName: string, fileSize: number, totalChunks: number) => {
-    try {
-      console.log('🚀 Initiating upload for:', fileName);
-      const response = await fetch('/api/file/initiate-upload', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ fileName, fileSize, totalChunks }),
-        credentials: 'include'
-      });
-      
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error('❌ Initiate upload failed:', response.status, errorText);
-        throw new Error(`Failed to initiate upload: ${response.status}`);
-      }
-      const data = await response.json();
-      console.log('✅ Upload initiated with ID:', data.uploadId);
-      return data.uploadId;
-    } catch (error) {
-      console.error('❌ Initiate upload error:', error);
-      toast.error("Failed to initiate upload");
-      throw error;
-    }
-  }, []);
-
-  const uploadChunk = useCallback(async (chunk: Blob, chunkIndex: number, uploadId: string) => {
-    const formData = new FormData();
-    formData.append('chunk', chunk);
-    formData.append('chunkIndex', chunkIndex.toString());
-    formData.append('uploadId', uploadId);
-
-    const response = await fetch('/api/file/upload-chunk', {
+    const response = await fetch('/api/file/initiate-upload', {
       method: 'POST',
-      body: formData,
-      credentials: 'include'
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ fileName, fileSize, totalChunks }),
     });
 
-    if (!response.ok) throw new Error(`Failed to upload chunk ${chunkIndex}`);
+    if (!response.ok) {
+      const text = await response.text();
+      throw new Error(`Failed to initiate upload: ${text}`);
+    }
+
+    return await response.json(); // { uploadId, key }
+  }, []);
+
+  // 2. Get signed URL for chunk from backend
+  const getUploadUrlForChunk = useCallback(async (uploadId: string, chunkIndex: number) => {
+    const response = await fetch('/api/file/get-upload-url', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ uploadId, chunkIndex }),
+    });
+
+    if (!response.ok) {
+      const text = await response.text();
+      throw new Error(`Failed to get signed URL for chunk ${chunkIndex}: ${text}`);
+    }
+
+    return await response.json(); // { url, partNumber }
+  }, []);
+
+  // 3. Upload chunk directly to S3 using signed URL
+  const uploadChunkToS3 = useCallback(async (signedUrl: string, chunk: Blob) => {
+    const response = await fetch(signedUrl, {
+      method: 'PUT',
+      body: chunk,
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to upload chunk to S3`);
+    }
+
+    const etag = response.headers.get('ETag');
+    if (!etag) throw new Error('Missing ETag header from S3 upload response');
+
+    return etag;
+  }, []);
+
+  // 4. Mark chunk as uploaded on backend with ETag info
+  const markChunkUploaded = useCallback(async (uploadId: string, chunkIndex: number, etag: string) => {
+    const response = await fetch('/api/file/mark-chunk-uploaded', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ uploadId, chunkIndex, etag }),
+    });
+
+    if (!response.ok) {
+      const text = await response.text();
+      throw new Error(`Failed to mark chunk ${chunkIndex} uploaded: ${text}`);
+    }
+
     return await response.json();
   }, []);
 
+  // 5. Complete multipart upload (tells backend to finalize)
   const completeChunkedUpload = useCallback(async (uploadId: string, fileName: string) => {
-    try {
-      const response = await fetch('/api/file/complete-upload', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ uploadId, fileName }),
-        credentials: 'include'
-      });
+    const response = await fetch('/api/file/complete-upload', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ uploadId, fileName }),
+    });
 
-      if (!response.ok) throw new Error('Failed to complete upload');
-      const data = await response.json();
-      toast.success("File uploaded successfully");
-      refreshFiles();
-      return data;
-    } catch (error) {
-      toast.error("Failed to complete upload");
-      throw error;
+    if (!response.ok) {
+      const text = await response.text();
+      throw new Error(`Failed to complete upload: ${text}`);
     }
-  }, [refreshFiles]);
 
-  const cancelChunkedUpload = useCallback(async (uploadId: string) => {
-    if (!uploadId) return;
-    
-    try {
-      await fetch('/api/file/cancel-upload', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ uploadId }),
-        credentials: 'include'
-      });
-    } catch (error) {
-      console.error('Failed to cancel upload:', error);
-    }
+    return await response.json();
   }, []);
 
-  // Main chunked upload function - FIXED VERSION
+  // 6. Cancel upload
+  const cancelChunkedUpload = useCallback(async (uploadId: string) => {
+    if (!uploadId) return;
+
+    await fetch('/api/file/cancel-upload', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ uploadId }),
+    });
+  }, []);
+
+  // ------------- Main chunked upload function -------------
+
   const uploadFileChunked = useCallback(async (file: File) => {
-    console.log('📁 Starting chunked upload for:', file.name, 'Size:', file.size);
-    
     try {
       const totalChunks = Math.ceil(file.size / CHUNK_SIZE);
-      
-      // Reset and initialize state
+
       setChunkedUploadState({
         uploadId: null,
-        isUploading: true,
-        totalChunks,
         currentChunk: 0,
+        totalChunks,
         progress: 0,
-        isPaused: false
+        isPaused: false,
+        isUploading: true,
       });
 
-      // Initiate upload
-      const currentUploadId = await initiateChunkedUpload(file.name, file.size, totalChunks);
-      
-      // Update state with uploadId
-      setChunkedUploadState(prev => ({ 
-        ...prev, 
-        uploadId: currentUploadId 
-      }));
+      // Step 1: Initiate upload
+      const { uploadId } = await initiateChunkedUpload(file.name, file.size, totalChunks);
 
-      // Upload chunks
+      setChunkedUploadState(prev => ({ ...prev, uploadId }));
+
       for (let chunkIndex = 0; chunkIndex < totalChunks; chunkIndex++) {
-        // Check if paused - use ref to get current state
+        // Pause check
         while (uploadStateRef.current.isPaused) {
-          await new Promise(resolve => setTimeout(resolve, 100));
+          await new Promise(r => setTimeout(r, 100));
         }
 
-        // Check if cancelled - use ref to get current state
+        // Cancel check
         if (!uploadStateRef.current.isUploading) {
-          console.log('❌ Upload cancelled by user');
-          break;
+          toast.error('Upload cancelled');
+          return false;
         }
-
-        console.log(`📤 Uploading chunk ${chunkIndex + 1}/${totalChunks}`);
 
         const start = chunkIndex * CHUNK_SIZE;
         const end = Math.min(start + CHUNK_SIZE, file.size);
         const chunk = file.slice(start, end);
 
-        await uploadChunk(chunk, chunkIndex, currentUploadId);
-        
+        // Step 2: Get signed URL for this chunk
+        const { url } = await getUploadUrlForChunk(uploadId, chunkIndex);
+
+        // Step 3: Upload chunk to S3
+        const etag = await uploadChunkToS3(url, chunk);
+
+        // Step 4: Mark chunk uploaded with ETag on backend
+        await markChunkUploaded(uploadId, chunkIndex, etag);
+
         // Update progress
         const progress = Math.round(((chunkIndex + 1) / totalChunks) * 100);
         setChunkedUploadState(prev => ({
           ...prev,
           currentChunk: chunkIndex + 1,
-          progress
+          progress,
         }));
       }
 
-      // Complete the upload if all chunks uploaded
-      if (uploadStateRef.current.isUploading) {
-        console.log('✅ Completing upload...');
-        await completeChunkedUpload(currentUploadId, file.name);
-        
-        // Reset state on successful completion
-        setChunkedUploadState({
-          uploadId: null,
-          currentChunk: 0,
-          totalChunks: 0,
-          progress: 0,
-          isPaused: false,
-          isUploading: false,
-        });
-        return true;
-      }
-      
-      return false;
-    } catch (error) {
-      console.error('❌ Chunked upload failed:', error);
-      toast.error("Upload failed");
-      return false;
-    } finally {
-      setChunkedUploadState(prev => ({ ...prev, isUploading: false }));
-    }
-  }, [initiateChunkedUpload, uploadChunk, completeChunkedUpload]);
+      // Step 5: Complete upload
+      await completeChunkedUpload(uploadId, file.name);
 
-  // Smart upload function that chooses between regular and chunked upload
+      toast.success('Upload completed successfully');
+      refreshFiles();
+
+      setChunkedUploadState({
+        uploadId: null,
+        currentChunk: 0,
+        totalChunks: 0,
+        progress: 0,
+        isPaused: false,
+        isUploading: false,
+      });
+
+      return true;
+    } catch (error: any) {
+      toast.error(error.message || 'Upload failed');
+      setChunkedUploadState(prev => ({ ...prev, isUploading: false }));
+      return false;
+    }
+  }, [
+    initiateChunkedUpload,
+    getUploadUrlForChunk,
+    uploadChunkToS3,
+    markChunkUploaded,
+    completeChunkedUpload,
+    refreshFiles,
+  ]);
+
+  // ------------- Smart upload chooses chunked or regular -------------
+
+  // Regular (simple) upload fallback for small files (optional)
+  const uploadFile = useCallback(async (file: File) => {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+      const res = await fetch('/api/file/upload', {
+        method: 'POST',
+        body: formData,
+        credentials: 'include',
+      });
+
+      if (!res.ok) {
+        throw new Error('Upload failed');
+      }
+
+      toast.success('Upload successful');
+      refreshFiles();
+      return true;
+    } catch {
+      toast.error('Upload failed');
+      return false;
+    }
+  }, [refreshFiles]);
+
   const smartUpload = useCallback(async (file: File) => {
-    const fileSizeLimit = 50 * 1024 * 1024; // 50MB threshold
-    console.log(`📁 Smart upload: File size ${file.size}, Limit: ${fileSizeLimit}`);
-    
-    if (file.size > fileSizeLimit) {
-      console.log('📦 Using chunked upload');
+    const CHUNK_UPLOAD_THRESHOLD = 50 * 1024 * 1024; // 50MB
+
+    if (file.size > CHUNK_UPLOAD_THRESHOLD) {
       return await uploadFileChunked(file);
     } else {
-      console.log('📤 Using regular upload');
       return await uploadFile(file);
     }
-  }, [uploadFile, uploadFileChunked]);
+  }, [uploadFileChunked, uploadFile]);
 
+  // Pause, resume, cancel controls
   const pauseChunkedUpload = useCallback(() => {
     setChunkedUploadState(prev => ({ ...prev, isPaused: true }));
   }, []);
@@ -393,13 +391,10 @@ export const useFileOperations = ({ onSuccess }: UseFileOperationsProps = {}) =>
   }, []);
 
   const cancelUpload = useCallback(async () => {
-    console.log('🛑 Cancelling upload...');
-    setChunkedUploadState(prev => ({ ...prev, isUploading: false }));
-    
-    if (uploadStateRef.current.uploadId) {
-      await cancelChunkedUpload(uploadStateRef.current.uploadId);
-    }
-    
+    if (!uploadStateRef.current.uploadId) return;
+
+    await cancelChunkedUpload(uploadStateRef.current.uploadId);
+
     setChunkedUploadState({
       uploadId: null,
       currentChunk: 0,
@@ -417,15 +412,18 @@ export const useFileOperations = ({ onSuccess }: UseFileOperationsProps = {}) =>
     restoreFile,
     shareFile,
     removeSharedFile,
-    uploadFile, // Original upload (for backward compatibility)
-    uploadFileChunked, // Chunked upload
-    smartUpload, // Smart upload that chooses method based on file size
-    refreshFiles,
-    // Chunked upload controls
+
+    // Upload functions
+    uploadFile,
+    uploadFileChunked,
+    smartUpload,
+
+    // Controls
     pauseChunkedUpload,
     resumeChunkedUpload,
     cancelUpload,
-    // Chunked upload state
+
+    // Upload state
     chunkedUploadState,
   };
 };
