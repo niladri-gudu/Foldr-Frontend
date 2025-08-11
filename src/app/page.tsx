@@ -16,6 +16,7 @@ export default function LandingPage() {
       try {
         const res = await fetch(`/api/auth/me`, {
           credentials: "include",
+          cache: "no-store"
         });
         const data = await res.json();
 

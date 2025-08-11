@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Download } from "lucide-react";
 import { Spinner } from "@/components/ui/spinner";
 
 type FilePageClientProps = {
@@ -58,27 +58,35 @@ export default function FilePageClient({ id }: FilePageClientProps) {
 
   return (
     <div className="min-h-screen bg-white dark:bg-black text-gray-900 dark:text-gray-100 px-6 py-10 sm:px-10 md:px-16 lg:px-24 xl:px-36">
-      {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8 gap-4">
         <Button
           variant="outline"
           onClick={() => router.back()}
-          className="w-fit"
+          className="w-fit self-start sm:self-auto"
         >
           <ArrowLeft className="mr-2 h-4 w-4" /> Go Back
         </Button>
 
-        <div className="text-left sm:text-right max-w-xl truncate">
-          <h1 className="text-2xl sm:text-3xl font-semibold truncate">
-            {file.name}
-          </h1>
-          <p className="text-sm mt-1 text-gray-600 dark:text-gray-400">
-            {file.type} • {(file.size / 1024 / 1024).toFixed(2)} MB
-          </p>
+        <div className="text-left sm:text-right max-w-xl truncate flex flex-col sm:flex-row sm:items-center sm:justify-end gap-4 sm:gap-8">
+          <div className="sm:order-2">
+            <Button asChild variant="default" className="w-full sm:w-fit">
+              <a href={`/api/file/download/${id}`}>
+                <Download className="mr-2 h-4 w-4" /> Download
+              </a>
+            </Button>
+          </div>
+
+          <div className="sm:order-1 text-left sm:text-right">
+            <h1 className="text-xl sm:text-2xl md:text-3xl font-semibold truncate">
+              {file.name}
+            </h1>
+            <p className="text-sm mt-1 text-gray-600 dark:text-gray-400">
+              {file.type} • {(file.size / 1024 / 1024).toFixed(2)} MB
+            </p>
+          </div>
         </div>
       </div>
 
-      {/* File Preview */}
       <div className="w-full flex justify-center items-center min-h-[400px] md:min-h-[500px] rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 p-6">
         {isImage && (
           <div className="relative w-full h-[70vh] max-w-5xl">
