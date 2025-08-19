@@ -25,10 +25,13 @@ export default function FilePageClient({ id }: FilePageClientProps) {
   useEffect(() => {
     const fetchFile = async () => {
       try {
-        const res = await fetch(`/api/file/view/${id}`, {
-          method: "GET",
-          credentials: "include",
-        });
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/file/view/${id}`,
+          {
+            method: "GET",
+            credentials: "include", // send cookies if using cookie auth
+          }
+        );
 
         if (!res.ok) throw new Error("File not found");
 
@@ -41,7 +44,7 @@ export default function FilePageClient({ id }: FilePageClientProps) {
     };
 
     fetchFile();
-  }, []);
+  }, [id, router]);
 
   if (!file) {
     return (
@@ -70,7 +73,9 @@ export default function FilePageClient({ id }: FilePageClientProps) {
         <div className="text-left sm:text-right max-w-xl truncate flex flex-col sm:flex-row sm:items-center sm:justify-end gap-4 sm:gap-8">
           <div className="sm:order-2">
             <Button asChild variant="default" className="w-full sm:w-fit">
-              <a href={`/api/file/download/${id}`}>
+              <a
+                href={`${process.env.NEXT_PUBLIC_API_URL}/file/download/${id}`}
+              >
                 <Download className="mr-2 h-4 w-4" /> Download
               </a>
             </Button>

@@ -28,18 +28,21 @@ export function SignupForm({
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
+  // ✅ Use API base URL (frontend must have NEXT_PUBLIC_API_URL in .env.local)
+  const API_BASE = process.env.NEXT_PUBLIC_API_URL;
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     setLoading(true);
 
     try {
-      const res = await fetch(`/api/auth/register`, {
+      const res = await fetch(`${API_BASE}/auth/register`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        credentials: "include",
+        credentials: "include", // important for cookies
         body: JSON.stringify({ name, email, password }),
       });
 

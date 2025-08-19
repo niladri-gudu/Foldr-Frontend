@@ -63,32 +63,37 @@ export default function FileActions({ file }: { file: any }) {
   };
 
   const validateUser = async () => {
-    try {
-      const res = await fetch(`/api/file/shared/validate`, {
+  try {
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/file/shared/validate`,
+      {
         method: "POST",
         credentials: "include",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ email }),
-      });
-      const data = await res.json();
-
-      if (res.ok) {
-        setValidationResult(`User found: ${data.user.email}`);
-        setIsUserValid(true);
-      } else if (res.status === 400) {
-        setValidationResult("You cannot share a file with yourself");
-        setIsUserValid(false);
-      } else {
-        setValidationResult("User not found");
-        setIsUserValid(false);
       }
-    } catch (error) {
-      setValidationResult("Error validating user");
-      console.error("Error validating user:", error);
+    );
+
+    const data = await res.json();
+
+    if (res.ok) {
+      setValidationResult(`User found: ${data.user.email}`);
+      setIsUserValid(true);
+    } else if (res.status === 400) {
+      setValidationResult("You cannot share a file with yourself");
+      setIsUserValid(false);
+    } else {
+      setValidationResult("User not found");
+      setIsUserValid(false);
     }
-  };
+  } catch (error) {
+    setValidationResult("Error validating user");
+    console.error("Error validating user:", error);
+  }
+};
+
 
   const handleShare = async () => {
     const result = await shareFile(fileId, email);

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { useCallback, useState, useRef } from 'react';
 import { toast } from 'sonner';
@@ -42,7 +43,7 @@ export const useFileOperations = ({ onSuccess }: UseFileOperationsProps = {}) =>
 
   const starFile = useCallback(async (fileId: string, isStarred: boolean) => {
     try {
-      const res = await fetch(`${API_BASE}/api/file/starred/${fileId}`, {
+      const res = await fetch(`${API_BASE}/file/starred/${fileId}`, {
         method: "POST",
         credentials: "include",
       });
@@ -62,7 +63,7 @@ export const useFileOperations = ({ onSuccess }: UseFileOperationsProps = {}) =>
 
   const trashFile = useCallback(async (fileId: string) => {
     try {
-      const res = await fetch(`${API_BASE}/api/file/trash/${fileId}`, {
+      const res = await fetch(`${API_BASE}/file/trash/${fileId}`, {
         method: "POST",
         credentials: "include",
       });
@@ -82,7 +83,7 @@ export const useFileOperations = ({ onSuccess }: UseFileOperationsProps = {}) =>
 
   const deleteFile = useCallback(async (fileId: string) => {
     try {
-      const res = await fetch(`${API_BASE}/api/file/delete/${fileId}`, {
+      const res = await fetch(`${API_BASE}/file/delete/${fileId}`, {
         method: "DELETE",
         credentials: "include",
       });
@@ -102,7 +103,7 @@ export const useFileOperations = ({ onSuccess }: UseFileOperationsProps = {}) =>
 
   const restoreFile = useCallback(async (fileId: string) => {
     try {
-      const res = await fetch(`${API_BASE}/api/file/restore/${fileId}`, {
+      const res = await fetch(`${API_BASE}/file/restore/${fileId}`, {
         method: "POST",
         credentials: "include",
       });
@@ -122,7 +123,7 @@ export const useFileOperations = ({ onSuccess }: UseFileOperationsProps = {}) =>
 
   const shareFile = useCallback(async (fileId: string, email: string) => {
     try {
-      const res = await fetch(`${API_BASE}/api/file/shared/${fileId}`, {
+      const res = await fetch(`${API_BASE}/file/shared/${fileId}`, {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
@@ -145,7 +146,7 @@ export const useFileOperations = ({ onSuccess }: UseFileOperationsProps = {}) =>
 
   const removeSharedFile = useCallback(async (fileId: string) => {
     try {
-      const res = await fetch(`${API_BASE}/api/file/shared/${fileId}`, {
+      const res = await fetch(`${API_BASE}/file/shared/${fileId}`, {
         method: "DELETE",
         credentials: "include",
       });
@@ -166,7 +167,7 @@ export const useFileOperations = ({ onSuccess }: UseFileOperationsProps = {}) =>
   // ------------- Chunked upload helpers -------------
 
   const initiateChunkedUpload = useCallback(async (fileName: string, fileSize: number, totalChunks: number) => {
-    const response = await fetch(`${API_BASE}/api/file/initiate-upload`, {
+    const response = await fetch(`${API_BASE}/file/initiate-upload`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
@@ -182,7 +183,7 @@ export const useFileOperations = ({ onSuccess }: UseFileOperationsProps = {}) =>
   }, []);
 
   const getUploadUrlForChunk = useCallback(async (uploadId: string, chunkIndex: number) => {
-    const response = await fetch(`${API_BASE}/api/file/get-upload-url`, {
+    const response = await fetch(`${API_BASE}/file/get-upload-url`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
@@ -214,7 +215,7 @@ export const useFileOperations = ({ onSuccess }: UseFileOperationsProps = {}) =>
   }, []);
 
   const markChunkUploaded = useCallback(async (uploadId: string, chunkIndex: number, etag: string) => {
-    const response = await fetch(`${API_BASE}/api/file/mark-chunk-uploaded`, {
+    const response = await fetch(`${API_BASE}/file/mark-chunk-uploaded`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
@@ -230,7 +231,7 @@ export const useFileOperations = ({ onSuccess }: UseFileOperationsProps = {}) =>
   }, []);
 
   const completeChunkedUpload = useCallback(async (uploadId: string, fileName: string) => {
-    const response = await fetch(`${API_BASE}/api/file/complete-upload`, {
+    const response = await fetch(`${API_BASE}/file/complete-upload`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
@@ -248,7 +249,7 @@ export const useFileOperations = ({ onSuccess }: UseFileOperationsProps = {}) =>
   const cancelChunkedUpload = useCallback(async (uploadId: string) => {
     if (!uploadId) return;
 
-    await fetch(`${API_BASE}/api/file/cancel-upload`, {
+    await fetch(`${API_BASE}/file/cancel-upload`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
@@ -339,7 +340,7 @@ export const useFileOperations = ({ onSuccess }: UseFileOperationsProps = {}) =>
     formData.append('file', file);
 
     try {
-      const res = await fetch(`${API_BASE}/api/file/upload`, {
+      const res = await fetch(`${API_BASE}/file/upload`, {
         method: 'POST',
         body: formData,
         credentials: 'include',
