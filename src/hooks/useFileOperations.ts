@@ -4,7 +4,7 @@ import { toast } from 'sonner';
 
 const CHUNK_SIZE = 5 * 1024 * 1024; // 5MB chunks
 
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || '';
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || '';
 
 interface UseFileOperationsProps {
   onSuccess?: () => void;
