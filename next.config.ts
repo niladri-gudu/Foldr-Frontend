@@ -10,15 +10,15 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  async rewrites() {
-    return [
-      {
-        source: '/api/:path*',
-        destination: 'https://foldr-backend.vercel.app/:path*',
-        // destination: 'http://localhost:8000/:path*',
-      },
-    ];
-  },
+  // async rewrites() {
+  //   return [
+  //     {
+  //       source: '/api/:path*',
+  //       destination: 'https://foldr-backend.vercel.app/:path*',
+  //       // destination: 'http://localhost:8000/:path*',
+  //     },
+  //   ];
+  // },
 };
 
 export default nextConfig;

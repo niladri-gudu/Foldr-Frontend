@@ -8,18 +8,22 @@ import { ModeToggle } from "@/components/ModeToggle";
 import Image from "next/image";
 import logo from "../../public/cloud_logo.png";
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
 export default function LandingPage() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
     async function checkAuth() {
       try {
-        const res = await fetch(`/api/auth/me`, {
-          credentials: "include",
-          cache: "no-store"
+        const res = await fetch(`${API_URL}/auth/me`, {
+          credentials: "include", // needed for cookies
+          cache: "no-store",
         });
-        const data = await res.json();
 
+        if (!res.ok) throw new Error("Not logged in");
+
+        const data = await res.json();
         setIsLoggedIn(data.isLoggedIn);
       } catch (e) {
         setIsLoggedIn(false);
@@ -67,7 +71,8 @@ export default function LandingPage() {
             Your files, <span className="text-primary">everywhere</span>
           </h1>
           <p className="mt-6 text-lg text-muted-foreground sm:text-xl">
-            Store, sync, and share your files with Foldr. Access your documents, photos, and videos from any device, anywhere in the world.
+            Store, sync, and share your files with Foldr. Access your documents,
+            photos, and videos from any device, anywhere in the world.
           </p>
           <div className="mt-10 flex flex-wrap justify-center gap-4">
             {isLoggedIn ? (

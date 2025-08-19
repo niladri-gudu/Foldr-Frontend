@@ -33,14 +33,17 @@ export function LoginForm({
     setLoading(true);
 
     try {
-      const res = await fetch(`/api/auth/login`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify({ email, password }),
-      });
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/auth/login`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include", // important for cookies
+          body: JSON.stringify({ email, password }),
+        }
+      );
 
       const data = await res.json();
       if (!res.ok) {
