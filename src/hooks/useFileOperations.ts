@@ -359,7 +359,7 @@ export const useFileOperations = ({ onSuccess }: UseFileOperationsProps = {}) =>
   }, [refreshFiles]);
 
   const smartUpload = useCallback(async (file: File) => {
-    const CHUNK_UPLOAD_THRESHOLD = 50 * 1024 * 1024; // 50MB
+    const CHUNK_UPLOAD_THRESHOLD = 5 * 1024 * 1024;
 
     if (file.size > CHUNK_UPLOAD_THRESHOLD) {
       return await uploadFileChunked(file);

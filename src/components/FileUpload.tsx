@@ -59,7 +59,7 @@ const FileUpload = () => {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
   }
 
-  const isChunkedUpload = file && file.size > 50 * 1024 * 1024 // 50MB threshold
+  const isChunkedUpload = file && file.size > 5 * 1024 * 1024
   const showProgress = loading && (chunkedUploadState.isUploading || chunkedUploadState.progress > 0)
 
   return (
